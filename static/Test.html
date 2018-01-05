@@ -1,0 +1,191 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<script type="text/javascript" src="https://maps.ticketmaster.com/ism/dist/ice-4.0.0-66.js"></script>
+<div style="width:100%;height:100%">
+    <div id="map" style="background-color:white;width:100%;height:90%"></div>
+    <div id="selectorButton" style="top:8px;z-index:5; position:absolute"></div>
+    <button type="button" onclick='window.location.replace("AddGroup.html?");' class="save_seats" style="right=50px" >Save Seats</button>
+</div>
+
+
+    <script>
+       
+    var totalPlaces = [];
+var eventId = '190052C9DF8B2DE3';
+var neverWantToCodeAgain = ICE.loadFeatures(['canvas', 'seat-attributes', 'selection']).then(function(){
+
+    //instatiate ICE. metrics paramter required.
+    var ice = window.ice = ICE.create({
+      env: 'prod',
+      mobile: false
+    });
+
+//    var tokenBody = {
+//                      "payload": {
+//                      },
+//                        "options": {
+//                          "issuer": "Ticket4Now"
+//                      }
+//                    };
+//    var tokenPromise = fetch(`http://app.mr-jwt.us-east-1.prod-tmaws.io:8080/generate-token/${eventId}`, {
+//        method: 'POST',
+//        body: JSON.stringify(tokenBody)
+//    }).then((res) => {return res.json()});
+
+//    var seatAttributes = ICE.SeatAttributes.create(ice, {
+//      snapshotAttributes: {
+//        status: true,
+//        rawTT: true
+//      },
+//      streamAttributes: {
+//        status: true
+//      },
+//      //token: Promise.resolve(tokenPromise)
+//      token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0OTg4MzM1MTksImV4cCI6MTQ5ODgzNzExOSwiaXNzIjoiVGlja2V0NE5vdyIsInN1YiI6IjE5MDA1MjU2QjEwQjJCNjEifQ.KHwDPNg8K7L4bnYNYr38GeEn9cOYY2DhxMyfD36MGDU"
+//    });
+    ice.Place.addPluginProperty('status', 'OPEN', true);
+    ice.on("error", function(error){
+      console.log(error);
+    });
+
+
+
+    //create view
+    var map = window.map = ICE.Views.Map.create('map', ICE.CanvasRenderer.Map);
+    ice.addView(map);
+
+    var selection = ICE.Selection.create(ice, map, {buttonDiv: 'selectorButton'});
+    //add selection plugin here
+
+    //add tooltip
+
+    //add Templates here
+    ice.templates.find('default-place').clickEvents = false;
+    ice.templates.find('default-place').hoverEvents = false;
+    var openTemplates = ICE.Template.create({interiorColor: 'A8CAD7', clickEvents:true, hoverEvents: true}).ByPlace({status: 'OPEN'});
+    var selectedTemplate = ICE.Template.create({interiorColor: 'EA34FE'}).ByPlace({'selected': true});
+
+    ice.templates.add(openTemplates);
+    ice.templates.add(selectedTemplate);
+
+
+
+    map.on('selected', function (selEvent) {
+        totalPlaces = [];
+      var compArray = selEvent.places.complete;
+      for (var i=0; i<compArray.length; i++ ){
+        var places = compArray[i];
+        totalPlaces = totalPlaces.concat(places);
+      }
+      console.log(totalPlaces);
+    });
+
+    map.on('unselected', function (selEvent) {
+        totalPlaces = [];
+      var compArray = selEvent.places.complete;
+      for (var i=0; i<compArray.length; i++ ){
+        var places = compArray[i];
+        totalPlaces = totalPlaces.concat(places);
+      }
+      console.log(totalPlaces);
+    });
+
+
+    var defaultShape = ice.templates.find('default-shape');
+    defaultShape.alpha = 0.5;
+
+    //transparent section covers template.find
+
+    //Load data and starts animation loop
+    ice.loadData({map: eventId})
+      .then(function () {
+        map.enableMouseInteraction();
+        ice.startAnimation();
+      });
+  });
+
+// save seats to var
+// add a button for putting seats in cart
+    // Send event ID and place ID
+// Call endpoint Mindy is looking to
+// 4 carts for 4 seats
+// hand off to somewhere else
+
+
+//Protip: never do this ever. its gross and disgusting. never code like the shit below
+
+function cartCallback(args){
+    console.log(arguments);
+    const cartIds = []
+    //local storage html stuff
+    for(let obj of args){
+      cartIds.push(obj.cart.id);
+    }
+    fetch('url:8080',{
+        method: 'POST',
+        body: `[${cartIds}]`
+    }).then(function(){
+        //success
+        // Store cache
+        localStorage['cartIds'] = JSON.stringify(cartIds);
+        
+        // Redirect
+
+    }).catch(function(){
+    });
+
+}
+
+var url = 'https://app.ticketmaster.com/commerce/v2/shopping/carts.json?apikey=kG4jTNtXKJt3sFeF9qokcDGyYoW28yNX';
+
+
+function createCartPromises(){
+    var cartPromises = [];
+    var headers = new Headers();
+             headers.append('Content-Type', 'application/json');
+             headers.append('Accept', 'application/json');
+
+    for(let place of totalPlaces){
+        var body =
+        {
+                  "pollingCallbackUrl" : "http://requestb.in/14hknvt1",
+                  "products" : [ {
+                     "offers" : [ {
+                       "offer" : "000000000001"
+                     } ],
+                     "product" : eventId,
+                     "qty" : 1
+                   } ]
+                }
+
+
+         console.log(body);
+         var cartPromise = fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(body)
+         });
+                // iterate through each place and call endpoint that will create a cart based on (eventID and seatID)
+      cartPromises.push(cartPromise.then( (response) => {return response.json();}));
+    }
+    return cartPromises;
+}
+
+function saveToCart(){
+    var requests = createCartPromises();
+    console.log(requests);
+    // Handle return and pass it on to somwhere else.
+     return Promise.all(requests)
+        .then(cartCallback)
+        .catch(function(err){
+            console.log(err);
+        });
+}
+    </script>
+
+</body>
+</html>

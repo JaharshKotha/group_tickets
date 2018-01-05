@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <title>Confirm that you would like to go with {invitationCreator}</title>
+        <!-- Bootstrap core CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <!-- Custom styles for this template -->
+        <link href="/css/confirmPage.css" rel="stylesheet">
+        <link href="style.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container eventContainer">
+            <div class="row center-align text-center">
+                <br>
+                <div class="col-xs-12">
+                    <h3 class="white">Hi %s,  would you like to buy this ticket for %s? The whole world is waiting for you!</h3>
+                </div>
+                <br>
+                <br>
+                <div class="col-xs-6">
+                    <h4 class="white">The cost is %s</h4>
+                </div>
+                <div class="col-xs-6">
+                    <h4 class="white">The following people have confirmed</h4>
+                    <ul class="white">%s</ul>
+                </div>
+            </div>
+            <br>
+            <br>
+            <div class="row" align="center">
+                <center>
+                    <div>
+                        <h3 class="white">%s</h3>
+                        <br>
+                        <div class="thumbnail"> 
+                            <img src="%s" alt="" height="120" width="120">
+                            <div class="caption"> 
+                                <h4>EventDetails</h4>
+                                <p><a href="#" class="btn btn-success" role="button">Confirm</a> <a href="#" class="btn btn-danger" role="button">Decline</a></p> 
+                            </div>                             
+                        </div>                         
+                    </div>
+                </center>
+            </div>
+        </div>
+        <!-- Bootstrap core JavaScript
+    ================================================== -->
+        <!-- Placed at the end of the document so the pages load faster -->
+        <script src="/js/jquery.min.js"></script>
+        <script src="/html/bootstrap/js/bootstrap.min.js"></script>
+    </body>
+</html>
